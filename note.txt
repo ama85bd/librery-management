@@ -1,3 +1,11 @@
 npx create-next-app@latest
 npx shadcn@latest init
 npx shadcn@latest add button
+npx shadcn@latest add form
+npx shadcn@latest add input
+npx create-next-app@latest imagekit-next-app
+npm install imagekit 
+npx shadcn@latest add toast
+npm install prisma
+npm install @prisma/client
+npx prisma init

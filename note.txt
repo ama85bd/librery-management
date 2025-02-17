@@ -9,3 +9,6 @@ npx shadcn@latest add toast
 npm install prisma
 npm install @prisma/client
 npx prisma init
+npx prisma migrate dev --name init
+npx prisma generate
+npx prisma db push 

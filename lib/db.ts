@@ -1,6 +1,7 @@
 // lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 import { createClient } from 'redis';
+import config from './config';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
@@ -10,8 +11,9 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export const db = prisma;
 
+// Reids
 const client = createClient({
-  url: 'redis://default:1234@172.16.1.179:6379',
+  url: config.env.redisUrl,
 });
 
 client.on('error', (err) => console.log('Redis Client Error', err));

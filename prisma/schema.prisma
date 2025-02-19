@@ -4,6 +4,18 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Role {
+  ADMIN
+  USER
+  
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,6 +31,19 @@ model User{
   username String @unique
   password String
 
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Users{
+  id    String @unique @id @default(uuid()) @db.Uuid
+  full_name String
+  email String @unique
+  university_id String @unique
+  password String
+  university_card String
+  status  Status  @default(PENDING)
+  role  Role   @default(USER)
+  last_activity_date DateTime @default(now())
   createAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

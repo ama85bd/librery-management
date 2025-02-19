@@ -20,7 +20,7 @@ const BookOverview = async ({
   id,
   userId,
 }: Props) => {
-  await redisClient.hSet(`book:1`, { title: 'titel', author: 'author' });
+  // await redisClient.hSet(`book:3`, { title: 'titel3', author: 'author3' });
   return (
     <section className='book-overview'>
       <div className='flex flex-1 flex-col gap-5'>

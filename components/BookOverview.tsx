@@ -1,12 +1,13 @@
 import React from 'react';
 import Image from 'next/image';
 import BookCover from './BookCover';
+import { redisClient } from '@/lib/db';
 
 interface Props extends Book {
   userId: string;
 }
 
-const BookOverview = ({
+const BookOverview = async ({
   title,
   author,
   genre,
@@ -19,6 +20,7 @@ const BookOverview = ({
   id,
   userId,
 }: Props) => {
+  await redisClient.hSet(`book:1`, { title: 'titel', author: 'author' });
   return (
     <section className='book-overview'>
       <div className='flex flex-1 flex-col gap-5'>

@@ -8,6 +8,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log(body);
     const { email, username, password } = body;
 
     const existingUserByEmail = await db.user.findUnique({

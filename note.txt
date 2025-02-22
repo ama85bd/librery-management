@@ -16,3 +16,4 @@ npx prisma studio
 npm i redis
 npm install next-auth@beta
 npm install bcryptjs
+npx auth secret

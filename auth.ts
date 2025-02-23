@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from './lib/db';
 import { compare } from 'bcryptjs';
@@ -13,13 +13,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-
+        console.log('credentials', credentials);
         const user = await db.users.findUnique({
           where: {
             email: credentials?.email as string,
           },
         });
-
+        console.log('user', user);
         if (user === null) return null;
 
         const isPasswordValid = await compare(
@@ -37,4 +37,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.name = token.name as string;
+      }
+      return session;
+    },
+  },
+  secret: process.env.AUTH_SECRET,
+  pages: {
+    signIn: '/sign-in',
+  },
 });

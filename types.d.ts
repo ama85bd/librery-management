@@ -15,11 +15,11 @@ interface Book {
 }
 
 interface AuthCredentials {
-  fullName: string;
+  full_name: string;
   email: string;
   password: string;
-  universityId: number;
-  universityCard: string;
+  university_id: string;
+  university_card: string;
 }
 
 interface BookParams {

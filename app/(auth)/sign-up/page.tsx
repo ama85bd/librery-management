@@ -1,8 +1,8 @@
 'use client';
 
 import AuthForm from '@/components/AuthForm';
+import { signUp } from '@/lib/actions/auth';
 import { signUpSchema } from '@/lib/validations';
-// import { signUp } from '@/lib/actions/auth';
 
 const Page = () => (
   <AuthForm
@@ -11,11 +11,11 @@ const Page = () => (
     defaultValues={{
       email: '',
       password: '',
-      fullName: '',
-      universityId: 0,
-      universityCard: '',
+      full_name: '',
+      university_id: '',
+      university_card: '',
     }}
-    onSubmit={() => {}}
+    onSubmit={signUp}
   />
 );
 

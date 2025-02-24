@@ -96,7 +96,7 @@ const AuthForm = <T extends FieldValues>({
                     {FIELD_NAMES[field.name as keyof typeof FIELD_NAMES]}
                   </FormLabel>
                   <FormControl>
-                    {field.name === 'universityCard' ? (
+                    {field.name === 'university_card' ? (
                       <FileUpload
                         type='image'
                         accept='image/*'

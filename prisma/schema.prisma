@@ -36,7 +36,7 @@ model User{
 }
 model Users{
   id    String @unique @id @default(uuid()) @db.Uuid
-  full_name String
+  fullName String
   email String @unique
   university_id String @unique
   password String

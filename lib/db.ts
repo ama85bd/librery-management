@@ -12,10 +12,10 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 export const db = prisma;
 
 // Reids
-const client = createClient({
-  url: config.env.redisUrl,
-});
+// const client = createClient({
+//   url: config.env.redisUrl,
+// });
 
-client.on('error', (err) => console.log('Redis Client Error', err));
+// client.on('error', (err) => console.log('Redis Client Error', err));
 
-export const redisClient = await client.connect();
+// export const redisClient = await client.connect();

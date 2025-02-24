@@ -28,7 +28,7 @@ export const signInWithCredentials = async (
 };
 
 export const signUp = async (params: AuthCredentials) => {
-  const { full_name, email, university_id, password, university_card } = params;
+  const { fullName, email, university_id, password, university_card } = params;
 
   const existingUser = await db.users.findUnique({
     where: {
@@ -44,7 +44,7 @@ export const signUp = async (params: AuthCredentials) => {
   try {
     await db.users.create({
       data: {
-        full_name,
+        fullName,
         email,
         password: hashedPassword,
         university_id,

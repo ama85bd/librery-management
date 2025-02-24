@@ -32,13 +32,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           id: user.id.toString(),
           email: user.email,
-          name: user.full_name,
+          name: user.fullName,
         } as User;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
+      console.log('token');
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -53,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  secret: process.env.AUTH_SECRET,
+  // secret: process.env.AUTH_SECRET,
   pages: {
     signIn: '/sign-in',
   },

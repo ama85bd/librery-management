@@ -13,13 +13,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        console.log('credentials', credentials);
         const user = await db.users.findUnique({
           where: {
             email: credentials?.email as string,
           },
         });
-        console.log('user', user);
         if (user === null) return null;
 
         const isPasswordValid = await compare(
@@ -39,7 +37,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      console.log('token');
       if (user) {
         token.id = user.id;
         token.name = user.name;

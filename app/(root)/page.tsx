@@ -4,8 +4,8 @@ import { sampleBooks } from '@/constants';
 import { db } from '@/lib/db';
 
 const Home = async () => {
-  const result = await db.users.findMany({});
-  console.log(JSON.stringify(result, null, 2));
+  // const result = await db.users.findMany({});
+  // console.log(JSON.stringify(result, null, 2));
   return (
     <>
       <BookOverview {...sampleBooks[0]} />

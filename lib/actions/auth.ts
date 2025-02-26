@@ -3,11 +3,21 @@
 import { hash } from 'bcryptjs';
 import { db } from '../db';
 import { signIn } from '@/auth';
+import { headers } from 'next/headers';
+import { rateLimiter } from '../ratelimit';
+import { redirect } from 'next/navigation';
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, 'email' | 'password'>
 ) => {
   const { email, password } = params;
+
+  const ip = (await headers()).get('x-forwarded-for') || '127.0.0.1';
+  const { success } = await rateLimiter(ip, 1, 60);
+
+  if (!success) {
+    return redirect('/too-fast');
+  }
 
   try {
     const result = await signIn('credentials', {
@@ -29,6 +39,12 @@ export const signInWithCredentials = async (
 
 export const signUp = async (params: AuthCredentials) => {
   const { fullName, email, university_id, password, university_card } = params;
+  const ip = (await headers()).get('x-forwarded-for') || '127.0.0.1';
+  const { success } = await rateLimiter(ip, 10, 60);
+
+  if (!success) {
+    return redirect('/too-fast');
+  }
 
   const existingUser = await db.users.findUnique({
     where: {

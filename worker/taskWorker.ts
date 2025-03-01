@@ -23,14 +23,13 @@ import Redis from 'ioredis';
 const connection = new Redis('redis://default:1234@172.16.1.179:6379', {
   maxRetriesPerRequest: null, // Add this line
 });
-console.log('process.env.REDIS_URL!', 'redis://default:1234@172.16.1.179:6379');
 export const sampleQueue = new Queue('sampleQueue', {
   connection,
   defaultJobOptions: {
-    attempts: 2,
+    attempts: 3, // Retry 3 times if the job fails
     backoff: {
-      type: 'exponential',
-      delay: 5000,
+      type: 'exponential', // Exponential backoff for retries
+      delay: 5000, // Exponential backoff for retries
     },
   },
 });

@@ -18,11 +18,16 @@
 // });
 
 // import config from '@/lib/config';
+import EmailTemplate from '@/components/EmailTemplate';
 import { Worker, Queue } from 'bullmq';
 import Redis from 'ioredis';
+import { Resend } from 'resend';
+
 const connection = new Redis('redis://default:1234@172.16.1.179:6379', {
   maxRetriesPerRequest: null, // Add this line
 });
+const resend = new Resend(process.env.RESEND_TOKEN);
+
 export const sampleQueue = new Queue('sampleQueue', {
   connection,
   defaultJobOptions: {
@@ -33,6 +38,34 @@ export const sampleQueue = new Queue('sampleQueue', {
     },
   },
 });
+
+export const emailQueue = new Queue('emailQueue', {
+  connection,
+  defaultJobOptions: {
+    attempts: 3, // Retry 3 times if the job fails
+    backoff: {
+      type: 'exponential', // Exponential backoff for retries
+      delay: 5000, // Exponential backoff for retries
+    },
+  },
+});
+
+export const sendEmail = async ({
+  email,
+  subject,
+  message,
+}: {
+  email: string;
+  subject: string;
+  message: string;
+}) => {
+  await resend.emails.send({
+    from: 'Task Spice <hello.taskspice.com>',
+    to: email,
+    subject: subject,
+    react: EmailTemplate({ message: message }),
+  });
+};
 
 const worker = new Worker(
   'sampleQueue', // this is the queue name, the first string parameter we provided for Queue()

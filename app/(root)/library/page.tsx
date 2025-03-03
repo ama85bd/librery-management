@@ -9,14 +9,14 @@ const page = () => {
     setLoading(true);
     try {
       const res = await fetch('/api/enqueue', {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          task: 'sendEmail', // Sample task data
-          email: 'example@example.com',
-        }),
+        // body: JSON.stringify({
+        //   task: 'sendEmail', // Sample task data
+        //   email: 'example@example.com',
+        // }),
       });
 
       const data = await res.json();

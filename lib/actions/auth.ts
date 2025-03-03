@@ -6,6 +6,7 @@ import { signIn } from '@/auth';
 import { headers } from 'next/headers';
 import { rateLimiter } from '../ratelimit';
 import { redirect } from 'next/navigation';
+import { newSignUpQueue } from '@/worker/taskWorker';
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, 'email' | 'password'>
@@ -66,6 +67,11 @@ export const signUp = async (params: AuthCredentials) => {
         university_id,
         university_card,
       },
+    });
+
+    await newSignUpQueue.add('emailQueue', {
+      userId: 1,
+      email,
     });
 
     await signInWithCredentials({ email, password });

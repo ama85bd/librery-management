@@ -21,3 +21,4 @@ npx shadcn@latest add avatar ( use=>  --legacy-peer-deps)
 npm install bullmq ioredis --save
 npm run worker:sample
 npm install resend
+npm install cron

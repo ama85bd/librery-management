@@ -14,7 +14,7 @@ export const signInWithCredentials = async (
   const { email, password } = params;
 
   const ip = (await headers()).get('x-forwarded-for') || '127.0.0.1';
-  const { success } = await rateLimiter(ip, 1, 60);
+  const { success } = await rateLimiter(ip, 10, 60);
 
   if (!success) {
     return redirect('/too-fast');
@@ -44,6 +44,7 @@ export const signUp = async (params: AuthCredentials) => {
   const { success } = await rateLimiter(ip, 10, 60);
 
   if (!success) {
+    console.log('success', success);
     return redirect('/too-fast');
   }
 
@@ -69,7 +70,7 @@ export const signUp = async (params: AuthCredentials) => {
       },
     });
 
-    await newSignUpQueue.add('emailQueue', {
+    await newSignUpQueue.add('newSignUpQueue', {
       userId: 1,
       email,
     });

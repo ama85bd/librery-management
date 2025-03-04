@@ -70,20 +70,13 @@ export const emailQueue = new Queue('emailQueue', {
   },
 });
 
-export const sendEmail = async ({
-  email,
-  subject,
-  message,
-}: {
-  email: string;
-  subject: string;
-  message: string;
-}) => {
+const sendEmail = async (email: string, subject: string, message: string) => {
+  console.log('sendEmail', email);
   await resend.emails.send({
-    from: 'Task Spice <hello.taskspice.com>',
+    from: 'Task Spice <tech@taskspice.com>',
     to: email,
-    subject: subject,
-    react: EmailTemplate({ message: message }),
+    subject: subject || 'subject',
+    react: EmailTemplate({ message: message || 'message' }),
   });
 };
 
@@ -128,10 +121,10 @@ const newSignUpWorker = new Worker(
   'newSignUpQueue',
   async (job) => {
     const { userId, email } = job.data;
-    console.log(`Sending email to ${email} for user ${userId}`);
+    console.log(`Sending email to ${email} for user ${userId} newSignUpQueue`);
 
     // Send an email
-    await sendEmail(email, 'Subject', 'Message');
+    await sendEmail(email, 'subject newSignUpQueue', 'message newSignUpQueue ');
   },
   { connection }
 );
@@ -144,7 +137,7 @@ const emailWorker = new Worker(
     console.log(`Sending email to ${email} for user ${userId}`);
 
     // Send an email
-    await sendEmail(email);
+    await sendEmail(email, 'Email subject', 'Email message');
   },
   { connection }
 );
@@ -166,6 +159,8 @@ const checkInactiveUsers = async () => {
     },
   ];
 
+  const users = await db.users.findMany();
+
   // Get the current date
   const currentDate = new Date();
 
@@ -174,22 +169,34 @@ const checkInactiveUsers = async () => {
   oneMonthAgo.setMonth(currentDate.getMonth() - 1);
 
   // Filter users who have been inactive for the last one month
-  const usersToNotify = inactiveUsers.filter((user) => {
-    const lastActiveDate = new Date(user.lastActive);
+  const usersToNotify = users.filter((user) => {
+    const targetTime = new Date(user.last_activity_date); // Convert string to Date object
+
+    // Get the current time
+    const currentTime = new Date();
+
+    // Calculate the difference between target time and current time in milliseconds
+    const timeDifference = targetTime.getTime() - currentTime.getTime();
+
+    // Convert the difference from milliseconds to minutes
+    const minutesRemaining = timeDifference / (1000 * 60);
+    console.log('minutesRemaining', minutesRemaining);
+    const lastActiveDate = new Date(user.last_activity_date);
     return lastActiveDate < oneMonthAgo;
   });
 
   // Add a job for each inactive user
-  usersToNotify.forEach((user) => {
-    emailQueue.add('emailQueue', {
-      userId: user.id,
-      email: user.email,
-    });
-  });
+  // usersToNotify.forEach((user) => {
+  //   emailQueue.add('emailQueue', {
+  //     userId: user.id,
+  //     email: user.email,
+  //   });
+  // });
 };
 
+const monthlyJob = new CronJob('* * * * *', checkInactiveUsers);
 // Schedule the job to run on the 1st of every month at 9:00 AM
-const monthlyJob = new CronJob('0 9 1 * *', checkInactiveUsers);
+// const monthlyJob = new CronJob('0 9 1 * *', checkInactiveUsers);
 
 // Start the cron job
 monthlyJob.start();

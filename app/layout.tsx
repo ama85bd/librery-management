@@ -5,6 +5,8 @@ import { ReactNode } from 'react';
 import { Toaster } from '@/components/ui/toaster';
 import { SessionProvider } from 'next-auth/react';
 import { auth } from '@/auth';
+import { checkInactiveUsers } from '@/worker/taskWorker';
+import { CronJob } from 'cron';
 
 const ibmPlexSans = localFont({
   src: [
@@ -34,6 +36,31 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   const session = await auth();
+  // after(async () => {
+  //   await emailQueue.add('emailQueue', {});
+  // });
+
+  const monthlyJob = new CronJob('* * * * *', checkInactiveUsers);
+
+  // Start the cron job
+  monthlyJob.start();
+
+  // const enqueueJob = async () => {
+  //   try {
+  //     const res = await fetch('/api/cronJobScheduler', {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+
+  //     const data = await res.json();
+  //     console.log('Job enqueued: layout', data);
+  //   } catch (error) {
+  //     console.error('Error enqueuing job:', error);
+  //   }
+  // };
+  // enqueueJob();
   return (
     <html lang='en'>
       <SessionProvider session={session}>

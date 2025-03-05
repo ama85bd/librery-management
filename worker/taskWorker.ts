@@ -22,15 +22,14 @@ import EmailTemplate from '@/components/EmailTemplate';
 import { Worker, Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { Resend } from 'resend';
-import { CronJob } from 'cron';
 import { db } from '@/lib/db';
 
-type UserState = 'non-active' | 'active';
+// type UserState = 'non-active' | 'active';
 
-type InitialData = {
-  email: string;
-  fullName: string;
-};
+// type InitialData = {
+//   email: string;
+//   fullName: string;
+// };
 
 const connection = new Redis('redis://default:1234@172.16.1.179:6379', {
   maxRetriesPerRequest: null, // Add this line
@@ -80,26 +79,26 @@ const sendEmail = async (email: string, subject: string, message: string) => {
   });
 };
 
-const getUserState = async (email: string): Promise<UserState> => {
-  const user = await db.users.findUnique({
-    where: {
-      email: email,
-    },
-  });
+// const getUserState = async (email: string): Promise<UserState> => {
+//   const user = await db.users.findUnique({
+//     where: {
+//       email: email,
+//     },
+//   });
 
-  if (user === null) return 'non-active';
+//   if (user === null) return 'non-active';
 
-  const currentDate = new Date();
+//   const currentDate = new Date();
 
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(currentDate.getMonth() - 1);
+//   const oneMonthAgo = new Date();
+//   oneMonthAgo.setMonth(currentDate.getMonth() - 1);
 
-  const lastActiveDate = new Date(user.last_activity_date);
-  if (lastActiveDate <= oneMonthAgo) {
-    return 'non-active';
-  }
-  return 'active';
-};
+//   const lastActiveDate = new Date(user.last_activity_date);
+//   if (lastActiveDate <= oneMonthAgo) {
+//     return 'non-active';
+//   }
+//   return 'active';
+// };
 
 const worker = new Worker(
   'sampleQueue', // this is the queue name, the first string parameter we provided for Queue()
@@ -134,39 +133,23 @@ const emailWorker = new Worker(
   'emailQueue',
   async (job) => {
     const { userId, email } = job.data;
-    console.log(`Sending email to ${email} for user ${userId}`);
+    console.log(`Sending email to ${email} for user ${userId} emailQueue`);
 
     // Send an email
-    await sendEmail(email, 'Email subject', 'Email message');
+    await sendEmail(
+      email,
+      'We missed you',
+      'We missed you! Come back again to see more'
+    );
   },
   { connection }
 );
 
 // Function to check for inactive users and add jobs to the queue
-const checkInactiveUsers = async () => {
-  // Simulate fetching inactive users from your database
-  // Replace this with your actual database query
-  const inactiveUsers = [
-    {
-      id: 1,
-      email: 'user1@example.com',
-      lastActive: '2023-09-01T00:00:00.000Z',
-    },
-    {
-      id: 2,
-      email: 'user2@example.com',
-      lastActive: '2023-09-15T00:00:00.000Z',
-    },
-  ];
-
+export const checkInactiveUsers = async () => {
   const users = await db.users.findMany();
 
-  // Get the current date
-  const currentDate = new Date();
-
   // Calculate the date one month ago
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(currentDate.getMonth() - 1);
 
   // Filter users who have been inactive for the last one month
   const usersToNotify = users.filter((user) => {
@@ -176,29 +159,20 @@ const checkInactiveUsers = async () => {
     const currentTime = new Date();
 
     // Calculate the difference between target time and current time in milliseconds
-    const timeDifference = targetTime.getTime() - currentTime.getTime();
+    const timeDifference = currentTime.getTime() - targetTime.getTime();
 
     // Convert the difference from milliseconds to minutes
     const minutesRemaining = timeDifference / (1000 * 60);
-    console.log('minutesRemaining', minutesRemaining);
-    const lastActiveDate = new Date(user.last_activity_date);
-    return lastActiveDate < oneMonthAgo;
+    return minutesRemaining > 43833;
   });
 
-  // Add a job for each inactive user
-  // usersToNotify.forEach((user) => {
-  //   emailQueue.add('emailQueue', {
-  //     userId: user.id,
-  //     email: user.email,
-  //   });
-  // });
+  //Add a job for each inactive user
+  usersToNotify.forEach((user) => {
+    emailQueue.add('emailQueue', {
+      userId: user.id,
+      email: user.email,
+    });
+  });
 };
-
-const monthlyJob = new CronJob('* * * * *', checkInactiveUsers);
-// Schedule the job to run on the 1st of every month at 9:00 AM
-// const monthlyJob = new CronJob('0 9 1 * *', checkInactiveUsers);
-
-// Start the cron job
-monthlyJob.start();
 
 export { worker, emailWorker, newSignUpWorker };

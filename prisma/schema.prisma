@@ -13,7 +13,11 @@ enum Status {
 enum Role {
   ADMIN
   USER
-  
+}
+
+enum BORROW_STATUS {
+  BORROWED
+  RETURNED
 }
 
 generator client {
@@ -46,4 +50,37 @@ model Users{
   last_activity_date DateTime @default(now())
   createAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  borrowRecords BorrowRecords[] // One-to-many relationship to BorrowRecords
+}
+
+model Books{
+  id String @unique @id @default(uuid()) @db.Uuid
+  title String @db.VarChar(255)
+  author String @db.VarChar(255)
+  genre String 
+  rating Float
+  coverUrl String
+  coverColor String @db.VarChar(7)
+  description String 
+  totalCopies Int @default(1)
+  availableCopies Int @default(0)
+  videoUrl String 
+  summary String 
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  borrowRecords BorrowRecords[] // One-to-many relationship to BorrowRecords
+}
+
+model BorrowRecords{
+  id String @unique @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  bookId String @db.Uuid
+  borrowDate DateTime @default(now()) @db.Timestamptz  // DateTime with timezone and default current date/time
+   status  BORROW_STATUS  @default(BORROWED)
+  dueDate DateTime 
+  returnDate DateTime?
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user Users @relation(fields: [userId], references: [id]) // Referencing User's id using userId
+  book Books @relation(fields: [bookId], references: [id])
 }
